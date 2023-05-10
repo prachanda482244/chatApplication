@@ -20,7 +20,7 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
     const fetchChats = async () => {
         try {
 
-            // const { data } = await axios.get('http://localhost:3000/api/chats', config)
+            // const { data } = await axios.get('http://localhost:5000/api/chats', config)
             const { data } = await axios.get('/api/chats', config)
             setChats(data)
         } catch (error) {
@@ -35,10 +35,10 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
             console.log(error.message)
         }
     }
-
     useEffect(() => {
         setLoggedUser(JSON.parse(localStorage.getItem("users")))
         fetchChats()
+        // eslint-disable-next-line
     }, [fetchAgain])
 
 

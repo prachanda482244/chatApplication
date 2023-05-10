@@ -6,7 +6,7 @@ import UserBadgeItem from '../Users/UserBadgeItem'
 import axios from 'axios'
 import UserListItem from '../Users/UserListItem'
 
-const UpdateGroupChat = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [groupChatName, setGroupChatName] = useState()
     const [search, setSearch] = useState()
@@ -43,6 +43,7 @@ const UpdateGroupChat = ({ fetchAgain, setFetchAgain }) => {
 
             user1.id === user._id ? setSelectedChat() : setSelectedChat(data)
             setFetchAgain(!fetchAgain)
+            fetchMessages()
             setLoading(false)
         } catch (error) {
 
