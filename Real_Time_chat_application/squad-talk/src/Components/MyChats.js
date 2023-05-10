@@ -7,18 +7,20 @@ import ChatLoading from './ChatLoading'
 import { getSender } from '../config/Chatlogics'
 import GroupChatModal from './miscellaneous/GroupChatModal'
 
-const MyChats = () => {
+const MyChats = ({ fetchAgain, setFetchAgain }) => {
     const [loggedUser, setLoggedUser] = useState()
     const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState()
     const toast = useToast()
 
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    }
     const fetchChats = async () => {
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${user.token}`
-                }
-            }
+
+            // const { data } = await axios.get('http://localhost:3000/api/chats', config)
             const { data } = await axios.get('/api/chats', config)
             setChats(data)
         } catch (error) {
@@ -30,12 +32,14 @@ const MyChats = () => {
                 isClosable: true,
                 position: 'bottom-left'
             })
+            console.log(error.message)
         }
     }
+
     useEffect(() => {
         setLoggedUser(JSON.parse(localStorage.getItem("users")))
         fetchChats()
-    }, [])
+    }, [fetchAgain])
 
 
     return (
@@ -88,10 +92,8 @@ const MyChats = () => {
                     chats ? (
                         <Stack overflowY={'scroll'}>
 
-
-
                             {
-                                chats.map((chat) => {
+                                chats.map((chat) => (
                                     <Box onClick={() => setSelectedChat(chat)}
                                         cursor='pointer'
                                         bg={selectedChat === chat ? '#38B2AC' : '#e8e8e8'}
@@ -101,13 +103,13 @@ const MyChats = () => {
                                         borderRadius={'lg'}
                                         key={chat._id}
                                     >
+
                                         <Text>
-                                            {console.log(chat + 'array')}
-                                            {!chat.isGroupChat ? getSender(loggedUser, chat[0].users) : chat[0].chatName
+                                            {!chat.isGroupChat ? getSender(loggedUser, chat.users) : (chat.chatName)
                                             }
-                                        </Text>+
+                                        </Text>
                                     </Box>
-                                })
+                                ))
                             }
                         </Stack>
                     ) : (

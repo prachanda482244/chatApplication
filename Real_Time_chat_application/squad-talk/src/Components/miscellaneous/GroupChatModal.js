@@ -14,7 +14,6 @@ const GroupChatModal = ({ children }) => {
     const [searchResult, setsearchResult] = useState([])
     const toast = useToast()
     const { user, chats, setChats } = ChatState()
-    const log = console.log
 
 
     const config = {
@@ -25,7 +24,6 @@ const GroupChatModal = ({ children }) => {
     const handleSearch = async (query) => {
         setSearch(query)
         if (!query) return
-
         try {
             setLoading(true)
 
@@ -138,7 +136,7 @@ const GroupChatModal = ({ children }) => {
 
                         {loading ? <Spinner /> : (
                             searchResult?.slice(0, 4).map(user => (
-                                <UserListItem key={user._id} user={user} HandleShowUser={() => HandleGroup(user)} />
+                                < UserListItem key={user._id} user={user} HandleFunction={() => HandleGroup(user)} />
                             ))
                         )}
                     </ModalBody>
