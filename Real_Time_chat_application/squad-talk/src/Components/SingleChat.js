@@ -11,7 +11,7 @@ import Lottie from 'react-lottie'
 import io from 'socket.io-client'
 import animationData from '../animation/typing.json'
 
-const ENDPOINT = "https://squad-talk.vercel.com/"
+const ENDPOINT = "https://squad-talk.vercel.app/"
 let socket, selectedChatCompare
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
