@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider'
 import ProfileModal from './ProfileModal'
 import { useNavigate } from 'react-router-dom'
+
 import axios from 'axios'
 import {
     Drawer,
@@ -14,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import ChatLoading from '../ChatLoading'
 import UserListItem from '../Users/UserListItem'
+import { getSender } from '../../config/Chatlogics'
 
 const SideDrawer = () => {
     const [search, setSearch] = useState('')
@@ -109,16 +111,25 @@ const SideDrawer = () => {
                 </Tooltip>
                 <Text fontSize='2xl' fontFamily='work sans'>Squad Talk</Text>
 
-                <div>
+                <div >
                     <Menu>
-                        <MenuButton p={1}>
+                        <MenuButton p={1} style={{ position: 'relative' }}>
                             <BellIcon fontSize='2xl' m={1} />
-
+                            <span style={{ color: notification.length !== 0 ? 'red' : 'black', fontSize: '18px', position: "absolute", top: -5, right: 6 }}>
+                                {notification.length}
+                            </span>
                         </MenuButton>
                         <MenuList pl={4}>
-                            {
-                                !notification.length && "No new notification"
-                            }
+                            {!notification.length && "No new notification"}
+                            {notification.map((notify) => (
+                                <MenuItem key={notify._id} onClick={() => {
+                                    setSelectedChat(notify.chat)
+                                    setNotification(notification.filter((n) => n !== notify))
+
+                                }}>
+                                    {notify.chat.isGroupChat ? `New message in ${notify.chat.chatName}` : `New Message from ${getSender(user, notify.chat.users)}`}
+                                </MenuItem>
+                            ))}
                         </MenuList>
                     </Menu>
 
