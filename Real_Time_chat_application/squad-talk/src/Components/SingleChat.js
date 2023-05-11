@@ -7,31 +7,48 @@ import ProfileModal from './miscellaneous/ProfileModal'
 import UpdateGroupChat from './miscellaneous/UpdateGroupChat'
 import axios from 'axios'
 import ScrollableChat from './ScrollableChat'
+import Lottie from 'react-lottie'
 import io from 'socket.io-client'
+import animationData from '../animation/typing.json'
+
 const ENDPOINT = "http://localhost:5000"
 let socket, selectedChatCompare
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-    const { user, selectedChat, setSelectedChat } = ChatState()
+    const { user, selectedChat, setSelectedChat, notification, setNotification } = ChatState()
     const [message, setMessage] = useState([])
     const [newMessage, setNewMessage] = useState()
     const [loading, setLoading] = useState(false)
     const [socketConnected, setSocketConnected] = useState(false)
+    const [typing, setTyping] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
+
     const config = {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`
         }
     }
+    const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        rendererSettings: {
+            preserveAspectRatio: "xMidyMid slice"
+        }
+    }
 
     useEffect(() => {
         socket = io(ENDPOINT)
         socket.emit('setup', user)
-        socket.on('connection', () => setSocketConnected(true))
+        socket.on('connected', () => setSocketConnected(true))
+        socket.on('typing', () => setIsTyping(true))
+        socket.on('stop typing', () => setIsTyping(false))
     }, [])
 
     const sendMessage = async (event) => {
         if (event.key === 'Enter' && newMessage) {
+            socket.emit('stop typing', selectedChat._id)
             try {
                 setNewMessage("")
                 const { data } = await axios.post('/api/messages', {
@@ -83,16 +100,37 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setNewMessage(e.target.value)
 
         // Typing Indicator logic
+        if (!socketConnected) return
+        if (!typing) {
+            setTyping(true)
+            socket.emit('typing', selectedChat._id)
+        }
+        let lastTypingTime = new Date().getTime()
+        let timerLength = 3000
+        setTimeout(() => {
+            let timeNow = new Date().getTime()
+            let timeDifference = timeNow - lastTypingTime
+            if (timeDifference >= timerLength && typing) {
+                socket.emit('stop typing', selectedChat._id)
+                setTyping(false)
+            }
+        }, timerLength)
     }
     useEffect(() => {
         fetchMessages()
         selectedChatCompare = selectedChat
     }, [selectedChat])
 
+    console.log(notification + ' -----')
     useEffect(() => {
         socket.on('message recieved', (newMessageReceived) => {
             if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
                 // give notification
+                if (!notification.includes(newMessageReceived)) {
+                    setNotification([newMessageReceived, ...notification])
+                    setFetchAgain(!fetchAgain)
+                }
+
             } else {
                 setMessage([...message, newMessageReceived])
             }
@@ -165,6 +203,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                 )
                             }
                             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+                                {isTyping ? <div>
+                                    <Lottie
+                                        options={defaultOptions}
+                                        width={70}
+                                        style={{ marginBottom: 15, marginLeft: 0 }}
+                                    />
+                                </div> : <></>}
+
                                 <Input variant={'filled'} placeholder="Enter a message " bg='#E0E0E0' onChange={typingHandler} value={newMessage} />
 
 

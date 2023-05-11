@@ -22,7 +22,7 @@ const SideDrawer = () => {
     const [loadingChat, setLoadingChat] = useState(false)
     const navigate = useNavigate()
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const { user, setSelectedChat, chats, setChats } = ChatState()
+    const { user, setSelectedChat, chats, setChats, notification, setNotification } = ChatState()
     const toast = useToast()
 
     const logoutHandler = () => {
@@ -115,7 +115,11 @@ const SideDrawer = () => {
                             <BellIcon fontSize='2xl' m={1} />
 
                         </MenuButton>
-                        {/* <MenuList></MenuList> */}
+                        <MenuList pl={4}>
+                            {
+                                !notification.length && "No new notification"
+                            }
+                        </MenuList>
                     </Menu>
 
                     <Menu>
