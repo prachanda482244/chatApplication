@@ -25,7 +25,6 @@ const ProfileModal = ({ user, children }) => {
                             src={user.pic}
                             alt={user.name}
                         />
-                        <Button variant='outline'>Update Details</Button>
                         <Text fontSize={{ base: '28px', md: '30px' }}
                             fontFamily={'work sans'}>{user.email}</Text>
                     </ModalBody>
